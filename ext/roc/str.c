@@ -19,7 +19,7 @@ union roc_str
   char small[SMALL_STRING_SIZE];
 };
 
-static inline bool is_small(union roc_str *str)
+static inline bool is_small(const union roc_str *str)
 {
   return str->small[SMALL_STR_MAX_LENGTH] < 0;
 }
@@ -53,11 +53,11 @@ static void dfree(void *data)
     // Encoded refcount should always be negative. If it wrapped to positive, Roc must have already freed the string.
     if (encoded_rc > 0)
     {
-      rb_raise_cstr("Ruby tried to free a Roc Str, but Roc has already freed it. This is a bug in the platform or glue code.");
+      rb_raise(rb_eRuntimeError, "Ruby tried to free a Roc Str, but Roc has already freed it. This is a bug in the platform or glue code.");
     }
     if (encoded_rc != REFCOUNT_ONE)
     {
-      rb_raise_cstr("Ruby tried to free a Roc Str while Roc still has a reference to it. This is a bug in the platform or glue code.");
+      rb_raise(rb_eRuntimeError, "Ruby tried to free a Roc Str while Roc still has a reference to it. This is a bug in the platform or glue code.");
     }
     ruby_xfree(rc_ptr);
   }

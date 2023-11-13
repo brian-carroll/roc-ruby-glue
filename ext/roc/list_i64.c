@@ -85,7 +85,7 @@ static VALUE list_allocate(VALUE klass)
 
 static VALUE list_initialize(VALUE self, VALUE ruby_array_int)
 {
-  size_t len = (size_t)rb_array_len(ruby_array_int);
+  size_t len = rb_array_len(ruby_array_int);
   if (!len)
   {
     return Qnil;

@@ -1,4 +1,8 @@
 /.ignore/
+/.vscode/
 *.o
+*.so
+*.dylib
+*.bundle
 *.out
 Makefile

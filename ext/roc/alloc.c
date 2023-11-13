@@ -1,5 +1,5 @@
 #include <ruby.h>
-#include "roc.h"
+#include "alloc.h"
 
 void* roc_alloc(size_t size, uint32_t _alignment)
 {
