@@ -16,10 +16,11 @@ struct roc_type
   char *name;
   size_t alignment;
   size_t stack_size;
-  void (*from_ruby)(void *, VALUE);
-  void (*free)(void *);
-  VALUE (*to_ruby)
-  (void *);
+  void (*from_ruby)(struct roc_type*, void *, VALUE);
+  void (*free)(struct roc_type*, void *);
+  VALUE (*to_ruby)(struct roc_type*, void *);
+  size_t n_type_vars;
+  struct roc_type type_vars[];
 };
 
 extern VALUE cRocValue;

@@ -41,6 +41,7 @@ struct roc_list_meta
   struct roc_list list;
   struct roc_type elem_type;
 };
+const struct roc_type list_type_roc;
 
 ID id_roc_type;
 
@@ -74,7 +75,7 @@ static void dfree(void *data)
       void *end = list.elements + (list.length * elem_type.stack_size);
       for (void *elem = list.elements; elem < end; elem += elem_type.stack_size)
       {
-        elem_type.free(elem);
+        elem_type.free(&list_type_roc, elem);
       }
     }
     size_t elem_alignment = adjusted_alignment(elem_type.alignment);
@@ -136,7 +137,7 @@ static VALUE initialize(VALUE self, VALUE elem_class_v, VALUE ruby_array)
   for (size_t i = 0; i < len; i++)
   {
     VALUE ruby_elem = rb_ary_entry(ruby_array, i);
-    meta->elem_type.from_ruby(roc_elem, ruby_elem);
+    meta->elem_type.from_ruby(&list_type_roc, roc_elem, ruby_elem);
     roc_elem += meta->elem_type.stack_size;
   }
 
@@ -149,14 +150,15 @@ static VALUE m_from_ruby(VALUE klass, VALUE elem_class, VALUE ruby_array)
   initialize(new_obj, elem_class, ruby_array);
 }
 
-static VALUE to_ruby(struct roc_list_meta *meta)
+static VALUE to_ruby(struct roc_type* self_type, void* meta_void)
 {
+  struct roc_list_meta *meta = meta_void;
   VALUE ruby_array = rb_ary_new_capa(meta->list.length);
 
   void *roc_elem = meta->list.elements;
   for (size_t i = 0; i < meta->list.length; i++)
   {
-    VALUE ruby_elem = meta->elem_type.to_ruby(roc_elem);
+    VALUE ruby_elem = meta->elem_type.to_ruby(&list_type_roc, roc_elem);
     rb_ary_push(ruby_array, ruby_elem);
   }
 
@@ -166,7 +168,12 @@ static VALUE to_ruby(struct roc_list_meta *meta)
 static VALUE m_to_ruby(VALUE self)
 {
   struct roc_list_meta *meta = RTYPEDDATA_DATA(self);
-  return to_ruby(meta);
+  return to_ruby(&list_type_roc, meta);
+}
+
+static void from_ruby(void *write_roc_ptr, VALUE ruby_array)
+{
+
 }
 
 static VALUE from_roc_ptr(VALUE klass, VALUE roc_ptr)
@@ -196,7 +203,7 @@ const struct roc_type list_type_roc = {
     .alignment = __alignof__(struct roc_list),
     .stack_size = sizeof(struct roc_list),
     .to_ruby = to_ruby,
-    .from_ruby =,
+    .from_ruby = from_ruby,
     .free = dfree,
 };
 
