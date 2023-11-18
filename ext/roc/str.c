@@ -1,6 +1,6 @@
 #include <ruby.h>
 #include <stdbool.h>
-#include "alloc.h"
+#include "roc.h"
 
 #define SMALL_STRING_SIZE sizeof(struct roc_big_str)
 #define SMALL_STR_MAX_LENGTH (SMALL_STRING_SIZE - 1)
